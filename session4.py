@@ -1,93 +1,106 @@
 import math
 import decimal
 from decimal import Decimal
+import random
 
 class Qualean(object):
-
-	def __init(self, input):
-		q1 = -1 # Maybe
-		q2 = 0 # False
-		q3 = 1 # True
-		c = input * random.uniform(-1,1)
-
-	def __and__(q1, q2):
-		q = (q1 and q2)
-		return a
-
-	def __or__(q1, q2):
-		q = (q1 | q2)
-		return q
-
-	def __repr__(q):
-		return repr(q)
-
-	def __str__(q):
-		return str(q)
-
-	def __add__(q1, q2):
-		q = q1 + q2
-		return q
-
-	def __eq__(q1, q2):
-		if q1 == q2:
-			return True
+	def __init__(self, value):
+		if(value in [1,0,-1]):
+			self.num = value
+			rand = random.uniform(-1, 1)
+			self.number = round((rand * self.num), 10)
 		else:
+			raise AttributeError('Invalid input')
+
+	def get_number(self):
+		return self.number
+
+	def __and__(self,other_object):
+		if not bool(self.number):
 			return False
+		else:
+			if isinstance(other_object,Qualean) and other_object.number:
+				return bool(self.number and other_object.number)
+			else:
+				return False
 
-	def __float__(q1):
-		return float(q1)
-
-	def __ge__(q1, q2):
-		if q1 >= q2:
+	def __or__(self,other_object):
+		if self.number:
 			return True
 		else:
-			False
+			if isinstance(other_object,Qualean) and other_object.number:
+				return bool(self.number or other_object.number)
+			else:
+				return False
 
-	def __gt__(q1, q2):
-		if q1 > q2:
-			return True
+	def __repr__(self):
+		return 'Qualean {0}'.format(self.number)
+
+	def __str__(self):
+		return 'Qualean: internal number ={0}'.format(self.number)
+
+	def __add__(self, num):
+		if(isinstance(num, Qualean)):
+			return self.number+num.number
+		return self.number+Decimal(str(num))
+
+	def __mul__(self, num):
+		if isinstance(num, Qualean):
+			return self.number * num.num
+		return self.number * Decimal(num)
+
+	def __eq__(self, num):
+		if isinstance(num, Qualean):
+			return self.number == num.number
+		return False
+
+	def __float__(self):
+		return float(self.number)
+
+	def __ge__(self, num):
+		if(isinstance(num, Qualean)):
+			return self.number >= num.number
+		return self.number >= Decimal(str(num))
+
+	def __gt__(self, num):
+		if(isinstance(num, Qualean)):
+			return self.number > num.number
+		return self.number>Decimal(str(num))
+
+	def __le__(self, num):
+		if(isinstance(num, Qualean)):
+			return self.number <= num.number
+		return self.number<=Decimal(str(num))
+
+	def __lt__(self, num):
+		if(isinstance(num, Qualean)):
+			return self.number < num.number
+		return self.number<Decimal(str(num))
+
+	def __invertsign__(self):
+		return self.number*Decimal('-1')
+
+	def __bool__(self):
+		return bool(self.number)
+
+	def __sqrt__(self):
+		if self.number < 0:
+			x = self.number * -1
+			return 1j * float(x.sqrt())
 		else:
-			return False
+			return self.number.sqrt()
 
-	def __invertsign__(q):
-		c = (-1) * q
-		return c
+	# def differentQs(q):
+	# 	return
 
-	def __le__(q1, q2):
-		if q1 <= q2:
-			return True
-		else:
-			return False
+	# def return_function1(q1, q2):
+	# 	return
 
-	def __lt__(q1, q2):
-		if q1 < q2:
-			return True
-		else:
-			return False
+	# def return_function2(q1, q2):
+	# 	return
 
-	def __mul__(q1, q2):
-		q = (q1 * q2)
-		return q
+	# def random_number(q1, q2):
+	# 	return
 
-	def __sqrt__(q):
-		c = math.sqrt(q)
-		return c
-
-	def __bool__(q):
-		return bool(q)
-
-	def differentQs(q):
-		return
-
-	def return_function1(q1, q2):
-		return
-
-	def return_function2(q1, q2):
-		return
-
-	def random_number(q1, q2):
-		return
-
-	def multiple_timesQ_equality(q):
-		return
-
+	# def multiple_timesQ_equality(q):
+	# 	return
