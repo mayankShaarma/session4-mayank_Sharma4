@@ -1,228 +1,182 @@
 import pytest
-import random
-import os
+import session4
 import inspect
 import re
-import decimal
-import session4
-import math
-from decimal import Decimal
 from session4 import Qualean
+import copy
+import random
+import os
+import math
 
-README_CONTENT_CHECK_FOR = [
-	'__and__',
-	'__or__',
-	'__repr__',
-	'__str__',
-	'__add__',
-	'__eq__',
-	'__float__',
-	'__ge__',
-	'__gt__',
-	'__invertsign__',
-	'__le__',
-	'__lt__',
-	'__mul__',
-	'__sqrt__',
-	'__bool__'
+CHECK_FOR_FUNCTIONS = [
+    '__and__',
+    '__or__',
+    '__repr__',
+    '__str__',
+    '__add__',
+    '__eq__',
+    '__float__',
+    '__ge__',
+    '__gt__',
+    '__invertsign__',
+    '__le__',
+    '__lt__',
+    '__mul__',
+    '__sqrt__',
+    '__bool__'
 ]
 
-
-# test 1
-def test_readme_exists():
-	assert os.path.isfile("README.md"), "README.md file missing!"
-
-#test 2
-def test_readme_contents():
-	readme = open("README.md", "r")
-	readme_words = readme.read().split()
-	readme.close()
-	assert len(readme_words) >=500, "Make your README.md file interesting! Add atleast 500 words"
-
-#test 3
-def test_readme_proper_description():
-	READMELOOKSGOOD = True
-	f = open("README.md", "r")
-	content = f.read()
-	f.close()
-	for c in README_CONTENT_CHECK_FOR:
-		if c not in content:
-			READMELOOKSGOOD = False
-			pass
-	assert READMELOOKSGOOD ==True, "You have not described all the function/class wel in your README file"
-
-#test 4
-def test_readme_file_formatting():
-	f = open("README.md", "r")
-	content = f.read()
-	f.close()
-	assert content.count("#") >= 10
-
-#test 5
-def test_indentation():
-	''' Return pass if used four spaces for each level of syntactically \
-	significant indenting.'''
-	lines = inspect.getsource(session4)
-	spaces = re.findall('\n +.',lines)
-	for space in spaces:
-		assert len(space) % 4 == 2, "Your script contains misplaced indentations"
-		assert len(re.sub(r'[^ ]', '', space)) % 4 == 0, "Your code indentations does not follow PEP8 guidelines"
-
-#test 6
+#test 1
 def test_function_name_had_cap_letter():
 	functions = inspect.getmembers(session4, inspect.isfunction)
 	for function in functions:
 		assert len(re.findall('([A-Z])', function[0])) == 0, "You have used Capital letter(s) in your function names"
 
-#test 7
-# def test_things_not_allowed():
-# 	code_lines = inspect.getsource(session4)
-# 	for word in CHECK_FOR_THINGS_NOT_ALLOWED:
-# 		assert word not in code_lines, 'Have you heard of Pinocchio?'
+def test_indentations():
+	''' Returns pass if used four spaces for each level of syntactically \
+	significant indenting.'''
+	lines = inspect.getsource(session4)
+	spaces = re.findall('\n +.', lines)
+	for space in spaces:
+		assert len(space) % 4 == 2, "Your script contains misplaced indentations"
+		assert len(re.sub(r'[^ ]', '', space)) % 4 == 0, "Your code indentation does not follow PEP8 guidelines" 
 
-#test 8
-def test_mul():
-	q = Qualean(random.choice([-1,0,1]))
-	sum = q
-	for i in range(99):
-		sum = q.__add__(sum)
-	assert sum==q.__mul__(100), 'Precision has been lost'
+def test_and_when_q2_not_defined():
+	q1=Qualean(0)
+	q2=None
+	assert q1 & q2 == False, "__and__ function is not short circuiting"
 
-#test 9
-# def test_sqrt():
-# 	myinput = [-1,0,1]
-# 	q = Qualean(random.choice(myinput))
-# 	assert q.__sqrt__() == Decimal(str(q.number)).sqrt(), 'square root and Decimal of q sqrt not equal!.'
-def test_sqrt():
-	myinput = [-1,0,1]
-	q1 = Qualean(random.choice(myinput))
-	if(q1<0):
-		assert isinstance(q1.__sqrt__(),complex), 'Sqrt should return complext value!!'
-	else:
-		assert q1.__sqrt__() == Decimal(q1.number).sqrt(), "Squre root deoesnt matches with Decimial.sqrt"
-
-# def test_check_sqrt():
-# 	choice = random.choice([1,0,-1])
-# 	q = Qualean(choice)
-# 	value = q.get_number()
-# 	if value>=0:
-# 		assert q.__sqrt__() == Decimal.sqrt(value), 'Squareroot [x]'
-# 	else:
-# 		assert q.__sqrt__() == 'i'+str(Decimal.sqrt(-value)), 'Squareroot [x]'
-
-
-#test 10
-def test_million_qsum():
-	mylist = [-1, 0, 1]
-	q = 1
-	myinput = random.choice(mylist)
-	for i in range(1000000):
-		q = Qualean(myinput) * q
-	assert math.isclose(i, 0, rel_tol=300), 'q is not appraching to 0'
-
-#test 11
-def test_bankers_rounding():
-	q1 = Qualean(random.choice([-1,0,1]))
-	assert len(str(q1).split(".")[-1]) == 10, 'your calculation will go wrong and run into losses.!'
-
-#test 12
-def test_or_notDefine_variable():
-	mylist = [-1,0,1]
-	myinput = random.choice(mylist)
-	q1 = Qualean(myinput)
-	q2 = None
-	assert q1.__or__(q2) == True, '__or__ function is not short circuiting.!'
-
-#test 13
-def test_and_notDefine_variable():
-	mylist = [-1,0,1]
-	myinput = random.choice(mylist)
-	q1 = Qualean(myinput)
-	q2 = None
-	assert q1.__and__(q2) == False, '__and__ function is not short circuiting.!'
-
-#test 14
-def test_and():
+def test_and_functionality():
 	q1 = Qualean(random.choice([-1,0,1]))
 	q2 = Qualean(random.choice([-1,0,1]))
-	if q1.number!=0 and q2.number!=0:
-		assert q1.__and__(q2)==True, 'And True case is not working properly.!'
+	if q1.get_number()!=0 and q2.get_number()!=0:
+		assert q1 & q2==True, "and True case is not working as expected"
 	else:
-		assert q1.__and__(q2)==False, 'And False case is not working properly.!'
+		assert q1 & q2==False, "and False case is not working as expected"
 
-#test 15
-def test_or():
+def test_or_when_q2_not_defined():
+	q1=Qualean(1)
+	q2=None
+	assert q1|q2 == True, "__or__ function is not short circuiting"
+
+def test_or_functionality():
 	q1 = Qualean(random.choice([-1,0,1]))
 	q2 = Qualean(random.choice([-1,0,1]))
-	if q1.number!=0 or q2.number!=0:
-		assert q1.__or__(q2)==True, 'Or True case is not working properly.!'
+	if q1.get_number()!=0 or q2.get_number()!=0:
+		assert q1|q2==True, "or True case is not working as expected"
 	else:
-		assert q1.__or__(q2)==True, 'Or False case is not working properly.!'
+		assert q1|q2==False, "or False case is not working as expected"
 
-#test 16
 def test_repr():
-	q = Qualean(random.choice([-1,0,1]))
+	q = Qualean(0)
 	assert 'object at' not in q.__repr__()
 
-#test 17
 def test_str():
-	q = Qualean(random.choice([-1,0,1]))
-	assert(str(q)), 'String function is not working'
+	q = Qualean(0)
+	internal_value = q.get_number()
+	assert q.__str__() == f'Qualean: internal number ={internal_value}', 'The print does not meet expectations'
 
-#test 18
-def test_add():
-	q1 = Qualean(random.choice([-1,0,1]))
-	q2 = Qualean(random.choice([-1,0,1]))
-	assert(math.isclose(q1+q2, q1.number+q2.number)), 'Your add function is not working properly.!'
+def test_add_mul():
+	q = Qualean(-1)
+	total = q
+	for x in range(99):
+		total = q+total
+	assert total==q*100, "Precision has been lost"
 
-#test 19
-def test_eq():
-	q1 = Qualean(random.choice([-1,0,1]))
-	q2=q1
-	assert(q2==q1), 'Equal to function not working properly.!'
-
-#test 20
-def test_float():
-	q1 = Qualean(random.choice([-1,0,1]))
-	assert isinstance(float(q1), float), ' Float conversion not working properly  '
-
-#test 21
 def test_ge():
 	q1 = Qualean(random.choice([-1,0,1]))
 	q2 = Qualean(random.choice([-1,0,1]))
-	if q1.number>= q2.number:
-		assert q1.__ge__(q2)==True, "__ge__ True case not working"
+	if q1.get_number()>= q2.get_number():
+		# print(q1.get_number())
+		# print(q2.get_number())
+		# print(True)
+		assert (q1>=q2)==True, "__ge__ True case not working"
 	else:
-		assert q1.__ge__(q2)==False, "__ge__ False case not working"
+		# print(q1.get_number())
+		# print(q2.get_number())
+		# print(False)
+		assert (q1>=q2)==False, "__ge__ False case not working"
 
-#test 22
 def test_gt():
 	q1 = Qualean(random.choice([-1,0,1]))
 	q2 = Qualean(random.choice([-1,0,1]))
-	assert(q2.number > abs(q1.number)), ' Greater than function not working properly.!'
+	if q1.get_number()> q2.get_number():
+		assert (q1>q2)==True, "__gt__ True case not working"
+	else:
+		assert (q1>q2)==False, "__gt__ False case not working"
 
-#test 23
 def test_le():
 	q1 = Qualean(random.choice([-1,0,1]))
 	q2 = Qualean(random.choice([-1,0,1]))
-	if q1.number <= q2.number:
-		assert q1.__le__(q2)==True, '__le__ True case not working'
+	if q1.get_number()<= q2.get_number():
+		assert (q1<=q2)==True, "__le__ True case not working"
 	else:
-		assert q1.__le__(q2)==False, '__le__ False case not working'
+		assert (q1<=q2)==False, "__le__ False case not working"
 
-#test 24
 def test_lt():
 	q1 = Qualean(random.choice([-1,0,1]))
 	q2 = Qualean(random.choice([-1,0,1]))
-	assert(q2 < abs(q1.number)), 'Less than  function  not working properly '
+	if q1.get_number()< q2.get_number():
+		assert (q1<q2)==True, "__lt__ True case not working"
+	else:
+		assert (q1<q2)==False, "__lt__ False case not working"
 
-#test 25
-def test_invertSign():
-	q1 = Qualean(random.choice([-1,0,1]))
-	q2 = q1.__invertsign__()
-	assert(q2 == -(q1.number)), ' Invertion function  not working properly'
+def test_all_functions_exist():
+	code_lines = inspect.getsource(session4)
+	for word in CHECK_FOR_FUNCTIONS:
+		assert word in code_lines, 'Have you heard of Pinocchio?'
 
-#test 26
+def test_readme_exists():
+	assert os.path.isfile("README.md"), "README.md file missing!"
+
+def test_readme_contents():
+	readme_words=[word for line in open('README.md', 'r', encoding="utf-8") for word in line.split()]
+	assert len(readme_words) >= 500, "Make your README.md file interesting! Add atleast 500 words"
+
+def test_readme_file_for_formatting():
+	f = open("README.md", "r", encoding="utf-8")
+	content = f.read()
+	f.close()
+	assert content.count("#") >= 10
+
+def test_readme_proper_description():
+	READMELOOKSGOOD = True
+	f = open("README.md", "r", encoding="utf-8")
+	content = f.read()
+	f.close()
+	for c in CHECK_FOR_FUNCTIONS:
+		if c not in content:
+			READMELOOKSGOOD = False
+			pass
+	assert READMELOOKSGOOD == True, "You have not described all the functions/class well in your README.md file"
+
+def test_invalid_input_valueerror():
+	with pytest.raises(ValueError):
+		Qualean(9)
+
+def test_float():
+	assert isinstance(float(Qualean(random.choice([-1,0,1]))), float), "float function not working"
+
 def test_bool():
+	assert isinstance(bool(Qualean(random.choice([-1,0,1]))), bool), "bool function not working"
+
+def test_invertsign():
+	q1 = Qualean(random.choice([-1,0,1]))
+	if q1.get_number()<0:
+		assert (q1.__invertsign__()>0)==True, "invertsign not working"
+	elif q1.get_number()>0:
+		assert (q1.__invertsign__()<0)==True, "invertsign not working"
+	else:
+		assert (q1.__invertsign__()==0)==True, "invertsign not working"
+
+def test_one_million_sum():
 	q = Qualean(random.choice([-1,0,1]))
-	assert(bool(q)), 'Bool function not working properly'
+	total = q
+	for x in range(1000000 - 1):
+		total = q+total
+	assert math.isclose(total,0), "Something is wrong"
+
+def test_eq():
+	q1 = Qualean(random.choice([-1,0,1]))
+	q2 = q1
+	assert(q2==q1), "qual to function not working properly.!"
